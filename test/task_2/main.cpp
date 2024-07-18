@@ -85,25 +85,22 @@ public:
 private:
     // Вспомогательный метод для установки бита
     void setBit(std::size_t index, bool value) {
-        if (index >= bit_size) {
-            throw std::out_of_range("Index exceeds vector bounds");
-        }
-        std::size_t data_index = index / 64;
-        std::size_t bit_index = index % 64;
-        if (value) {
-            data[data_index] |= (1ULL << bit_index);
-        } else {
-            data[data_index] &= ~(1ULL << bit_index);
-        }
+        std::size_t data_index = index  >> 6;  // index / 64
+        std::size_t bit_index = index & 0x3F; // = index % 64
+        uint64_t mask = 1ULL << bit_index;
+
+//        if (value) {
+//            data[data_index] |= mask;
+//        } else {
+//            data[data_index] &= ~mask;
+//        }
+        data[data_index] = (data[data_index] & ~mask) | (-static_cast<uint64_t>(value) & mask);
     }
 
     // Вспомогательный метод для получения значения бита
     bool getBit(std::size_t index) const {
-        if (index >= bit_size) {
-            throw std::out_of_range("Index exceeds vector bounds");
-        }
-        std::size_t data_index = index / 64;
-        std::size_t bit_index = index % 64;
+        std::size_t data_index = index >> 6;
+        std::size_t bit_index = index & 0x3F;
         return (data[data_index] >> bit_index) & 1;
     }
 };
@@ -130,3 +127,4 @@ int main() {
 
     return 0;
 }
+
